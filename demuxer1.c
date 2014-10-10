@@ -14,6 +14,13 @@
 
 #include "log.h"
 
+/*
+FIX: H.264 in some container format (FLV, MP4, MKV etc.) need
+"h264_mp4toannexb" bitstream filter (BSF)
+  *Add SPS,PPS in front of IDR frame
+  *Add start code ("0,0,0,1") in front of NALU
+H.264 in some container (MPEG2TS) don't need this BSF.
+*/
 // '1': Use H.264 Bitstream Filter
 #define USE_H264BSF (1)
 
@@ -46,7 +53,7 @@ int main(int argc, char *argv[]) {
     videoindex = -1;
 
     for (i = 0; i < ifmt_ctx->nb_streams; ++i) {
-        if (AVMEDIA_TYPE_VIDEO == ifmt_ctx->streams[i]->codec->codec) {
+        if (AVMEDIA_TYPE_VIDEO == ifmt_ctx->streams[i]->codec->codec_type) {
             videoindex = i;
         } else if (AVMEDIA_TYPE_AUDIO == ifmt_ctx->streams[i]->codec->codec_type) {
             audioindex = i;
